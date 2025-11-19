@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale}">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{login.title}">Entrar</title>
+</head>
+<body>
+
+<h1 th:text="#{login.title}">Entrar</h1>
+
+<p th:text="#{login.subtitle}">EcoWork - Sustentabilidade Corporativa</p>
+
+<form method="post" action="/auth/login">
+    <label th:text="#{login.email}">Email</label>
+    <input type="email" name="email">
+
+    <br><br>
+
+    <label th:text="#{login.password}">Senha</label>
+    <input type="password" name="senha">
+
+    <br><br>
+
+    <button type="submit" th:text="#{login.button}">Entrar</button>
+</form>
+
+</body>
+</html>
