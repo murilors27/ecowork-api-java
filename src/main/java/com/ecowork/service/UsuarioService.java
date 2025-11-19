@@ -6,8 +6,11 @@ import com.ecowork.exception.NotFoundException;
 import com.ecowork.mapper.UsuarioMapper;
 import com.ecowork.models.Empresa;
 import com.ecowork.models.Usuario;
+import com.ecowork.models.enums.RoleUsuario;
 import com.ecowork.repository.EmpresaRepository;
 import com.ecowork.repository.UsuarioRepository;
+import com.ecowork.security.AuthUtils;
+import com.ecowork.security.EmpresaSecurityValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,11 +24,17 @@ public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final EmpresaRepository empresaRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmpresaSecurityValidator empresaSecurityValidator;
+    private final AuthUtils authUtils;
 
     public UsuarioResponseDTO criar(UsuarioCreateDTO dto) {
 
         if (usuarioRepository.existsByEmail(dto.getEmail()))
             throw new BusinessException("Já existe um usuário com este e-mail.");
+
+        Usuario logado = authUtils.getUsuarioLogado();
+
+        empresaSecurityValidator.validarAcessoEmpresa(dto.getEmpresaId(), logado);
 
         Empresa empresa = empresaRepository.findById(dto.getEmpresaId())
                 .orElseThrow(() -> new NotFoundException("Empresa não encontrada."));
@@ -41,21 +50,31 @@ public class UsuarioService {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Usuário não encontrado."));
 
+        Usuario logado = usuarioRepository.findByEmail(emailLogado)
+                .orElseThrow(() -> new NotFoundException("Usuário autenticado não encontrado."));
+
+        empresaSecurityValidator.validarAcessoEmpresa(
+                usuario.getEmpresa().getId(),
+                logado
+        );
+
         if (usuario.getEmail().equals(emailLogado))
             return UsuarioMapper.toDTO(usuario);
 
-        Usuario admin = usuarioRepository.findByEmail(emailLogado)
-                .orElseThrow(() -> new NotFoundException("Usuário autenticado não encontrado."));
+        if (logado.getRole() == RoleUsuario.SYSTEM_ADMIN ||
+                logado.getRole() == RoleUsuario.COMPANY_ADMIN)
+            return UsuarioMapper.toDTO(usuario);
 
-        switch (admin.getRole()) {
-            case SYSTEM_ADMIN, COMPANY_ADMIN -> {
-                return UsuarioMapper.toDTO(usuario);
-            }
-            default -> throw new BusinessException("Você não tem permissão para visualizar este usuário.");
-        }
+        throw new BusinessException("Você não tem permissão para visualizar este usuário.");
     }
 
     public List<UsuarioResponseDTO> listarTodos() {
+
+        Usuario logado = authUtils.getUsuarioLogado();
+
+        if (logado.getRole() != RoleUsuario.SYSTEM_ADMIN)
+            throw new BusinessException("Apenas system admin pode listar todos os usuários.");
+
         return usuarioRepository.findAll()
                 .stream()
                 .map(UsuarioMapper::toDTO)
@@ -66,11 +85,15 @@ public class UsuarioService {
 
         Usuario usuario = buscarEntity(id);
 
-        boolean ehOProprio = usuario.getEmail().equals(emailLogado);
-
         Usuario logado = usuarioRepository.findByEmail(emailLogado)
                 .orElseThrow(() -> new NotFoundException("Usuário autenticado não encontrado."));
 
+        empresaSecurityValidator.validarAcessoEmpresa(
+                usuario.getEmpresa().getId(),
+                logado
+        );
+
+        boolean ehOProprio = usuario.getEmail().equals(emailLogado);
         boolean ehAdmin = logado.getRole().name().contains("ADMIN");
 
         if (!ehOProprio && !ehAdmin)
@@ -84,6 +107,12 @@ public class UsuarioService {
 
     public void deletar(Long id) {
         Usuario usuario = buscarEntity(id);
+
+        empresaSecurityValidator.validarAcessoEmpresa(
+                usuario.getEmpresa().getId(),
+                authUtils.getUsuarioLogado()
+        );
+
         usuarioRepository.delete(usuario);
     }
 
@@ -100,6 +129,11 @@ public class UsuarioService {
     }
 
     public List<UsuarioEmpresaListDTO> listarPorEmpresa(Long empresaId) {
+
+        empresaSecurityValidator.validarAcessoEmpresa(
+                empresaId,
+                authUtils.getUsuarioLogado()
+        );
 
         Empresa empresa = empresaRepository.findById(empresaId)
                 .orElseThrow(() -> new NotFoundException("Empresa não encontrada."));
