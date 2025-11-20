@@ -4,6 +4,8 @@ import com.ecowork.dto.registro.RegistroConsumoCreateDTO;
 import com.ecowork.dto.registro.RegistroConsumoResponseDTO;
 import com.ecowork.exception.NotFoundException;
 import com.ecowork.mapper.RegistroConsumoMapper;
+import com.ecowork.messaging.ConsumoEvent;
+import com.ecowork.messaging.ConsumoProducer;
 import com.ecowork.models.*;
 import com.ecowork.models.enums.RoleUsuario;
 import com.ecowork.models.enums.TipoConsumo;
@@ -26,6 +28,9 @@ public class RegistroConsumoService {
     private final PontuacaoService pontuacaoService;
     private final AuthUtils authUtils;
     private final EmpresaSecurityValidator empresaSecurityValidator;
+
+    // 🔥 Mensageria
+    private final ConsumoProducer consumoProducer;
 
     public RegistroConsumoResponseDTO criar(RegistroConsumoCreateDTO dto) {
 
@@ -64,6 +69,15 @@ public class RegistroConsumoService {
 
         usuarioRepository.save(usuario);
 
+        ConsumoEvent event = ConsumoEvent.builder()
+                .registroId(registro.getId())
+                .usuarioId(usuario.getId())
+                .tipoConsumo(registro.getTipo().name())
+                .valor(registro.getValor().toString())
+                .build();
+
+        consumoProducer.send(event);
+
         return RegistroConsumoMapper.toDTO(registro);
     }
 
@@ -88,11 +102,12 @@ public class RegistroConsumoService {
     }
 
     public Page<RegistroConsumoResponseDTO> listarTodos(int pagina, int tamanho) {
-        // apenas system admin pode listar tudo
         Usuario logado = authUtils.getUsuarioLogado();
 
         if (logado.getRole() != RoleUsuario.SYSTEM_ADMIN)
-            throw new com.ecowork.exception.BusinessException("Apenas administradores do sistema podem listar todos os registros.");
+            throw new com.ecowork.exception.BusinessException(
+                    "Apenas administradores do sistema podem listar todos os registros."
+            );
 
         Page<RegistroConsumo> page = registroRepository.findAll(PageRequest.of(pagina, tamanho));
         return page.map(RegistroConsumoMapper::toDTO);

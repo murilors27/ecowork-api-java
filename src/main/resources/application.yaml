@@ -33,6 +33,12 @@ spring:
     caffeine:
       spec: maximumSize=1000,expireAfterWrite=10m
 
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
 jwt:
   secret: "98Bdjw92hDla7Ahs82nBsiQpqowXpqLZ0092nzmaSLLQpqowmznvllaasdns001"
   expiration: 86400000
