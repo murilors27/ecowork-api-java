@@ -5,6 +5,7 @@ import com.ecowork.models.Usuario;
 import com.ecowork.models.enums.TipoPonto;
 import com.ecowork.repository.PontuacaoRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -15,6 +16,7 @@ public class PontuacaoService {
 
     private final PontuacaoRepository pontuacaoRepository;
 
+    @CacheEvict(value = {"rankingGlobal", "rankingEmpresa"}, allEntries = true)
     public void registrarPontos(Usuario usuario, int pontos) {
 
         Pontuacao p = Pontuacao.builder()

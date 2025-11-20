@@ -30,6 +30,8 @@ spring:
 
   cache:
     type: caffeine
+    caffeine:
+      spec: maximumSize=1000,expireAfterWrite=10m
 
 jwt:
   secret: "98Bdjw92hDla7Ahs82nBsiQpqowXpqLZ0092nzmaSLLQpqowmznvllaasdns001"

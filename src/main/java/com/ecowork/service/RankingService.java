@@ -6,6 +6,7 @@ import com.ecowork.models.Usuario;
 import com.ecowork.repository.UsuarioRepository;
 import com.ecowork.security.AuthUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -20,6 +21,7 @@ public class RankingService {
     private final UsuarioService usuarioService;
     private final AuthUtils authUtils;
 
+    @Cacheable(value = "rankingGlobal")
     public List<RankingUsuarioDTO> rankingGlobal() {
 
         List<Usuario> ordenados = usuarioRepository.findAll()
@@ -40,6 +42,7 @@ public class RankingService {
                 .toList();
     }
 
+    @Cacheable(value = "rankingEmpresa", key = "#empresaId")
     public List<RankingUsuarioDTO> rankingPorEmpresa(Long empresaId) {
 
         List<Usuario> ordenados = usuarioRepository.findAll()

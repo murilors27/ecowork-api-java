@@ -15,6 +15,8 @@ import com.ecowork.repository.MetaSustentavelRepository;
 import com.ecowork.security.AuthUtils;
 import com.ecowork.security.EmpresaSecurityValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,6 +30,7 @@ public class MetaService {
     private final AuthUtils authUtils;
     private final EmpresaSecurityValidator empresaSecurityValidator;
 
+    @CacheEvict(value = "metasAtivas", allEntries = true)
     public MetaResponseDTO criar(MetaCreateDTO dto) {
 
         Usuario logado = authUtils.getUsuarioLogado();
@@ -65,6 +68,7 @@ public class MetaService {
                 .toList();
     }
 
+    @Cacheable(value = "metasAtivas", key = "#empresaId")
     public List<MetaResponseDTO> listarPorEmpresa(Long empresaId) {
 
         empresaSecurityValidator.validarAcessoEmpresa(
@@ -93,6 +97,7 @@ public class MetaService {
                 .toList();
     }
 
+    @CacheEvict(value = "metasAtivas", allEntries = true)
     public MetaResponseDTO atualizar(Long id, MetaCreateDTO dto) {
 
         MetaSustentavel meta = buscarEntity(id);
@@ -115,6 +120,7 @@ public class MetaService {
         return MetaMapper.toDTO(meta);
     }
 
+    @CacheEvict(value = "metasAtivas", allEntries = true)
     public MetaResponseDTO atualizarStatus(Long id, StatusMeta status) {
 
         MetaSustentavel meta = buscarEntity(id);
@@ -130,6 +136,7 @@ public class MetaService {
         return MetaMapper.toDTO(meta);
     }
 
+    @CacheEvict(value = "metasAtivas", allEntries = true)
     public void deletar(Long id) {
 
         MetaSustentavel meta = buscarEntity(id);
