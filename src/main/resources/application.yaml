@@ -39,6 +39,13 @@ spring:
     username: guest
     password: guest
 
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      chat:
+        options:
+          model: gpt-4o-mini
+
 jwt:
   secret: "98Bdjw92hDla7Ahs82nBsiQpqowXpqLZ0092nzmaSLLQpqowmznvllaasdns001"
   expiration: 86400000
