@@ -3,14 +3,14 @@ spring:
     name: ecowork
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/ecowork
-    username: postgres
-    password: admin123
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
 
   jpa:
     hibernate:
       ddl-auto: none
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
@@ -34,20 +34,23 @@ spring:
       spec: maximumSize=1000,expireAfterWrite=10m
 
   rabbitmq:
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
+    host: ${SPRING_RABBITMQ_HOST:localhost}
+    port: ${SPRING_RABBITMQ_PORT:5672}
+    username: ${SPRING_RABBITMQ_USERNAME:guest}
+    password: ${SPRING_RABBITMQ_PASSWORD:guest}
+    listener:
+      simple:
+        auto-startup: ${SPRING_RABBITMQ_LISTENER_SIMPLE_AUTO_STARTUP:false}
 
   ai:
     openai:
-      api-key: ${OPENAI_API_KEY}
+      api-key: ${SPRING_AI_OPENAI_API_KEY}
       chat:
         options:
           model: gpt-4o-mini
 
 jwt:
-  secret: "98Bdjw92hDla7Ahs82nBsiQpqowXpqLZ0092nzmaSLLQpqowmznvllaasdns001"
+  secret: ${JWT_SECRET}
   expiration: 86400000
 
 logging:
