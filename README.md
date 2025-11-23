@@ -694,6 +694,23 @@ Authorization: Bearer <token>
 
 ---
 
+## Deploy e Acesso
+
+A aplicação está hospedada no **Render**, com acesso público.  
+O app mobile consome diretamente o endpoint do serviço online.
+
+**URL do Deploy:** [[deploy](https://ecowork-api.onrender.com)]
+
+---
+
+## Apresentação e Demonstração Técnica
+ 
+
+🔗 *Link para o Pitch:* [[pitch](https://youtu.be/qS40lLEHgVg)]
+🔗 *Link para a Demo:* [[demo](https://youtu.be/tCC9frSl5_w)]
+
+---
+
 ## Licença
 Projeto desenvolvido para fins acadêmicos (FIAP — Global Solution).
 Uso e modificação livres para estudo. Para uso comercial, recomenda-se revisão e adequações.
