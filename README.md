@@ -706,8 +706,8 @@ O app mobile consome diretamente o endpoint do serviço online.
 ## Apresentação e Demonstração Técnica
  
 
-🔗 *Link para o Pitch:* [[pitch](https://youtu.be/qS40lLEHgVg)]
-🔗 *Link para a Demo:* [[demo](https://youtu.be/tCC9frSl5_w)]
+- 🔗 *Link para o Pitch:* [[pitch](https://youtu.be/qS40lLEHgVg)]
+- 🔗 *Link para a Demo:* [[demo](https://youtu.be/tCC9frSl5_w)]
 
 ---
 
